@@ -5,14 +5,19 @@ const isProtectedRoute = createRouteMatcher([
   "/account(.*)",
   "/transaction(.*)",
 ]);
-export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
-  if (!userId && isProtectedRoute(req)) {
-    const { redirectToSignIn } = await auth();
+export default clerkMiddleware(
+  async (auth, req) => {
+    const { userId } = await auth();
+    if (!userId && isProtectedRoute(req)) {
+      const { redirectToSignIn } = await auth();
 
-    return redirectToSignIn();
-  }
-});
+      return redirectToSignIn();
+    }
+  },
+  {
+    clockSkewInMs: 60000, // Allow 60 seconds of clock skew tolerance
+  },
+);
 
 export const config = {
   matcher: [

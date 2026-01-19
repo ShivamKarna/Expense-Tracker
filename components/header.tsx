@@ -9,18 +9,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { LayoutDashboard, PenBox } from "lucide-react";
+import { checkUser } from "@/lib/checkUser";
 
-const Header = () => {
+const Header = async () => {
+  await checkUser();
   return (
     <div className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b">
-      <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <nav className="container mx-auto px-4 py-2 flex items-center justify-between">
         <Link href="/">
           <Image
             src="/Logo.png"
             alt="Logo"
-            width={200}
-            height={200}
-            className="h-36 w-auto object-contain"
+            width={120}
+            height={60}
+            className="h-12 w-auto object-contain"
           />
         </Link>
 

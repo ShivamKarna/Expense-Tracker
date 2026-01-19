@@ -5,9 +5,11 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { TrendingUp, Zap, PieChart } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
 
 const HeroSection = () => {
   const imageRef = useRef<HTMLDivElement>(null);
+  const { isSignedIn } = useAuth();
 
   useEffect(() => {
     const imageElement = imageRef.current;
@@ -65,7 +67,7 @@ const HeroSection = () => {
           analyze, and optimize your spending with real-time insights.
         </p>
         <div className="flex justify-center space-x-4 mb-5">
-          <Link href="/sign-in">
+          <Link href={isSignedIn ? "/dashboard" : "/sign-in"}>
             <Button size="lg" className="px-8">
               Get Started
             </Button>
