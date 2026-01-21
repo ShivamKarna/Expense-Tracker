@@ -53,3 +53,34 @@ export async function updateDefaultAccount(accountId: string) {
     return { success: false, error: errorMessage };
   }
 }
+
+export async function getAccountWithTransactions(accountId: string) {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!user) {
+    throw new Error("User not Found");
+  }
+  const account = await db.account.findUnique({
+    where: { id: accountId },
+    include: {
+      transactions: {
+        orderBy: { date: "desc" },
+      },
+      _count: {
+        select: { transactions: true },
+      },
+    },
+  });
+
+  if (!account || account.userId !== user.id) return null;
+  return {
+    ...serializeTransaction(account),
+    transactions: account.transactions.map(serializeTransaction),
+  };
+}
