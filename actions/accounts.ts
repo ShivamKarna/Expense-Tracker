@@ -3,19 +3,22 @@ import { db } from "@/lib/prisma";
 import { Account } from "@/types/account";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-const serializeTransaction = (obj: {
-  balance?: { toNumber: () => number };
-  [key: string]: unknown;
-}): Account => {
-  const serialized: Record<string, unknown> = { ...obj };
-  if (
-    obj.balance &&
-    typeof obj.balance === "object" &&
-    "toNumber" in obj.balance
-  ) {
-    serialized.balance = obj.balance.toNumber();
+
+const serializeDecimal = <T extends Record<string, unknown>>(obj: T): T => {
+  const serialized = { ...obj };
+  for (const key in serialized) {
+    const value = serialized[key];
+    if (value && typeof value === "object" && "toNumber" in value) {
+      (serialized as Record<string, unknown>)[key] = (
+        value as { toNumber: () => number }
+      ).toNumber();
+    }
   }
-  return serialized as Account;
+  return serialized;
+};
+
+const serializeAccount = (obj: Record<string, unknown>): Account => {
+  return serializeDecimal(obj) as unknown as Account;
 };
 
 export async function updateDefaultAccount(accountId: string) {
@@ -46,7 +49,7 @@ export async function updateDefaultAccount(accountId: string) {
     });
 
     revalidatePath("/dashboard");
-    return { success: true, data: serializeTransaction(account) };
+    return { success: true, data: serializeAccount(account) };
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
@@ -79,8 +82,14 @@ export async function getAccountWithTransactions(accountId: string) {
   });
 
   if (!account || account.userId !== user.id) return null;
+
+  const serializedAccount = serializeAccount(account);
+  const serializedTransactions = account.transactions.map((t) =>
+    serializeDecimal(t),
+  );
+
   return {
-    ...serializeTransaction(account),
-    transactions: account.transactions.map(serializeTransaction),
+    ...serializedAccount,
+    transactions: serializedTransactions,
   };
 }
