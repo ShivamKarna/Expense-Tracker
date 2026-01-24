@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -90,7 +90,72 @@ const TransactionTable = ({
   const [recurringFilter, setRecurringFilter]= useState("");
 
 
-  const filteredAndSortedTransactions = transactions;
+  const filteredAndSortedTransactions = useMemo(()=>{
+    let result = [...transactions];
+
+    // search filter
+    if(searchTerm){
+      const searchLower = searchTerm.toLocaleLowerCase();
+
+      result = result.filter((tr)=>
+      tr.description?.toLocaleLowerCase().includes(searchLower)
+    );
+    }
+
+    // recurringFilter
+    if(recurringFilter){
+
+      result = result.filter((tr)=>{
+        if(recurringFilter ==="recurring") return tr.isReccuring;
+        return !tr.isReccuring;
+      }
+    );
+    }
+
+    // typeFilter
+    if(typeFilter){
+      result = result.filter((tr)=> tr.type === typeFilter);
+    }
+
+    // Apply sorting
+    result.sort((a, b) => {
+      let aValue: string | number | Date;
+      let bValue: string | number | Date;
+
+      switch (sortConfig.field) {
+        case "date":
+          aValue = new Date(a.date).getTime();
+          bValue = new Date(b.date).getTime();
+          break;
+        case "category":
+          aValue = a.category.toLowerCase();
+          bValue = b.category.toLowerCase();
+          break;
+        case "amount":
+          aValue = typeof a.amount === "number" ? a.amount : a.amount.toNumber();
+          bValue = typeof b.amount === "number" ? b.amount : b.amount.toNumber();
+          break;
+        default:
+          return 0;
+      }
+
+      if (aValue < bValue) {
+        return sortConfig.direction === "asc" ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return sortConfig.direction === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+
+    return result;
+  },[
+    transactions,
+    searchTerm,
+    typeFilter,
+    recurringFilter,
+    sortConfig
+  ])
   const handleSort = (field: "date" | "category" | "amount") => {
     setSortConfig((current) => ({
       field,
@@ -135,8 +200,8 @@ const TransactionTable = ({
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="income">Income</SelectItem>
-            <SelectItem value="expense">Expense</SelectItem>
+            <SelectItem value="INCOME">Income</SelectItem>
+            <SelectItem value="EXPENSE">Expense</SelectItem>
           </SelectContent>
         </Select>
         <Select value={recurringFilter} onValueChange={(value)=>setRecurringFilter(value)}>
@@ -262,10 +327,10 @@ const TransactionTable = ({
                   <TableCell
                     className="text-right font-medium"
                     style={{
-                      color: transaction.type === "Expense" ? "red" : "green",
+                      color: transaction.type === "EXPENSE" ? "red" : "green",
                     }}
                   >
-                    {transaction.type === "Expense" ? "-" : "+"} Rs Rs{" "}
+                    {transaction.type === "EXPENSE" ? "-" : "+"} Rs Rs{" "}
                     {typeof transaction.amount === "number"
                       ? transaction.amount.toFixed(2)
                       : transaction.amount.toNumber().toFixed(2)}
