@@ -36,6 +36,8 @@ import { Badge } from "@/components/ui/badge";
 import {
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   MoreHorizontal,
   RefreshCw,
@@ -46,7 +48,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import useFetch from "@/hooks/use-fetch";
-import { bulkDeleteTransactions } from "@/actions/accounts";
+import { bulkDeleteTransactions, getAccountWithTransactionsPaginated } from "@/actions/accounts";
 import { toast } from "sonner";
 import { BarLoader } from "react-spinners";
 
@@ -75,9 +77,9 @@ type SortConfig = {
 };
 
 const TransactionTable = ({
-  transactions,
+  accountId,
 }: {
-  transactions: Transaction[];
+  accountId: string;
 }) => {
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -85,20 +87,50 @@ const TransactionTable = ({
     field: "date",
     direction: "desc",
   });
-
-
-
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const [searchTerm, setSearchTerm]= useState("");
   const [typeFilter, setTypeFilter]= useState("");
   const [recurringFilter, setRecurringFilter]= useState("");
 
+  const {
+    loading: fetchLoading,
+    fn: fetchTransactions,
+    data: accountData,
+  } = useFetch(getAccountWithTransactionsPaginated);
 
   const {
     loading : deleteLoading,
     fn : deletefn,
     data : deleted,
   } = useFetch(bulkDeleteTransactions);
+
+  // Fetch transactions when page or pageSize changes
+  useEffect(() => {
+    fetchTransactions(accountId, page, pageSize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountId, page, pageSize]);
+
+  // Refetch after deletion
+  useEffect(() => {
+    if(deleted && !deleteLoading){
+      toast.error("Transactions deleted successfully");
+      fetchTransactions(accountId, page, pageSize);
+      setSelectedIds([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deleted, deleteLoading]);
+
+  const transactions = accountData?.transactions || [];
+  const pagination = accountData?.pagination || { page: 1, pageSize: 10, totalCount: 0, totalPages: 1 };
+
+  const getAmountAsNumber = (amount: number | { toNumber: () => number }): number => {
+    if (typeof amount === "number") {
+      return amount;
+    }
+    return amount.toNumber();
+  };
 
   const handleBulkDelete = async()=>{
     if(
@@ -110,12 +142,6 @@ const TransactionTable = ({
 
     deletefn(selectedIds);
   }
-
-  useEffect(()=>{
-    if(deleted && !deleteLoading){
-      toast.error("Transactions deleted successfully")
-    }
-  },[deleted,deleteLoading])
 
 
   const filteredAndSortedTransactions = useMemo(()=>{
@@ -160,8 +186,8 @@ const TransactionTable = ({
           bValue = b.category.toLowerCase();
           break;
         case "amount":
-          aValue = typeof a.amount === "number" ? a.amount : a.amount.toNumber();
-          bValue = typeof b.amount === "number" ? b.amount : b.amount.toNumber();
+          aValue = getAmountAsNumber(a.amount);
+          bValue = getAmountAsNumber(b.amount);
           break;
         default:
           return 0;
@@ -213,9 +239,22 @@ const TransactionTable = ({
     setRecurringFilter("");
     setSelectedIds([]);
   };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      setPage(newPage);
+      setSelectedIds([]);
+    }
+  };
+
+  const handlePageSizeChange = (newPageSize: string) => {
+    setPageSize(Number(newPageSize));
+    setPage(1);
+    setSelectedIds([]);
+  };
   return (
     <div className="space-y-4">
-      {deleteLoading && 
+      {(deleteLoading || fetchLoading) && 
     <BarLoader className="mt-4" width={"100%"}color="#26d212"/>
       }
 
@@ -362,9 +401,7 @@ const TransactionTable = ({
                     }}
                   >
                     {transaction.type === "EXPENSE" ? "-" : "+"} Rs Rs{" "}
-                    {typeof transaction.amount === "number"
-                      ? transaction.amount.toFixed(2)
-                      : transaction.amount.toNumber().toFixed(2)}
+                    {getAmountAsNumber(transaction.amount).toFixed(2)}
                   </TableCell>
                   <TableCell>
                     {transaction.isReccuring ? (
@@ -434,6 +471,77 @@ const TransactionTable = ({
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination Controls */}
+      {pagination.totalCount > 0 && (
+        <div className="flex items-center justify-between px-2">
+          <div className="flex items-center gap-2">
+            <p className="text-sm text-muted-foreground">
+              Showing {(page - 1) * pageSize + 1} to{" "}
+              {Math.min(page * pageSize, pagination.totalCount)} of{" "}
+              {pagination.totalCount} transactions
+            </p>
+            <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+              <SelectTrigger className="w-[100px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
+            <span className="text-sm text-muted-foreground">per page</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1 || fetchLoading}
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Previous
+            </Button>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                let pageNum: number;
+                if (pagination.totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (page <= 3) {
+                  pageNum = i + 1;
+                } else if (page >= pagination.totalPages - 2) {
+                  pageNum = pagination.totalPages - 4 + i;
+                } else {
+                  pageNum = page - 2 + i;
+                }
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={page === pageNum ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handlePageChange(pageNum)}
+                    disabled={fetchLoading}
+                    className="w-8 h-8 p-0"
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === pagination.totalPages || fetchLoading}
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
