@@ -177,4 +177,34 @@
     scrollbar-width: thin;
     scrollbar-color: rgb(203 213 225) transparent;
   }
+
+  /* Smooth horizontal scrolling with hardware acceleration */
+  .smooth-horizontal-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scroll-behavior: smooth;
+    will-change: scroll-position;
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
+    contain: layout style paint;
+    isolation: isolate;
+    touch-action: pan-x;
+    -webkit-touch-callout: none;
+  }
+  
+  .smooth-horizontal-scroll > * {
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+  
+  /* Optimize table rendering during scroll */
+  .smooth-horizontal-scroll table {
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+  }
 }

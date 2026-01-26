@@ -35,9 +35,14 @@ export default async function AccountPage({
           <div className="text-lg sm:text-xl lg:text-2xl font-bold wrap-break-word">
             ${parseFloat(account.balance.toString()).toFixed(2)}
           </div>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            {account._count?.transactions || 0} Transactions
-          </p>
+          <div className="mt-2 flex items-center gap-2 sm:justify-end">
+            <span className="inline-flex items-center justify-center px-3 py-1.5 text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-sm">
+              {account._count?.transactions || 0}
+            </span>
+            <span className="text-xs sm:text-sm text-muted-foreground font-medium">
+              Transactions
+            </span>
+          </div>
         </div>
       </div>
 

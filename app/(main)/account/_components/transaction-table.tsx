@@ -296,21 +296,23 @@ const TransactionTable = ({
         )}
       </div>
     </div>
-      <div className="rounded-md border overflow-x-auto -mx-3 sm:mx-0 scroll-smooth custom-scrollbar">
-        <div className="min-w-[600px]">
+      <div className="rounded-md border overflow-x-auto -mx-3 sm:mx-0 scroll-smooth custom-scrollbar smooth-horizontal-scroll">
+        <div className="min-w-[650px] inline-block pl-1">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-12.5">
+              <TableHead className="w-14 min-w-[56px] px-3">
                 {!fetchLoading && (
-                  <Checkbox
-                    onCheckedChange={handleSelectAll}
-                    checked={
-                      selectedIds.length ===
-                        filteredAndSortedTransactions.length &&
-                      filteredAndSortedTransactions.length > 0
-                    }
-                  />
+                  <div className="flex items-center justify-center">
+                    <Checkbox
+                      onCheckedChange={handleSelectAll}
+                      checked={
+                        selectedIds.length ===
+                          filteredAndSortedTransactions.length &&
+                        filteredAndSortedTransactions.length > 0
+                      }
+                    />
+                  </div>
                 )}
               </TableHead>
               <TableHead
@@ -357,7 +359,7 @@ const TransactionTable = ({
                 </div>
               </TableHead>
               <TableHead>Recurring</TableHead>
-              <TableHead className="w-12.5" />
+              <TableHead className="w-14 min-w-[56px]" />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -365,8 +367,10 @@ const TransactionTable = ({
               // Skeleton loading rows
               Array.from({ length: pageSize }).map((_, index) => (
                 <TableRow key={`skeleton-${index}`}>
-                  <TableCell>
-                    <Skeleton className="h-4 w-4" />
+                  <TableCell className="w-14 min-w-[56px] px-3">
+                    <div className="flex items-center justify-center">
+                      <Skeleton className="h-4 w-4" />
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Skeleton className="h-4 w-24" />
@@ -400,13 +404,15 @@ const TransactionTable = ({
             ) : (
               filteredAndSortedTransactions.map((transaction) => (
                 <TableRow key={transaction.id}>
-                  <TableCell>
-                    <Checkbox
-                      onCheckedChange={() => handleSelect(transaction.id)}
-                      checked={selectedIds.includes(transaction.id)}
-                    />
+                  <TableCell className="w-14 min-w-[56px] px-3">
+                    <div className="flex items-center justify-center">
+                      <Checkbox
+                        onCheckedChange={() => handleSelect(transaction.id)}
+                        checked={selectedIds.includes(transaction.id)}
+                      />
+                    </div>
                   </TableCell>
-                  <TableCell className="whitespace-nowrap">
+                  <TableCell className="whitespace-nowrap min-w-[120px]">
                     {format(new Date(transaction.date), "PP")}
                   </TableCell>
                   <TableCell className="max-w-[200px] sm:max-w-none">
@@ -505,10 +511,20 @@ const TransactionTable = ({
       {!fetchLoading && pagination.totalCount > 0 && (
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 px-2">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-wrap">
-            <p className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
-              Showing {(page - 1) * pageSize + 1} to{" "}
-              {Math.min(page * pageSize, pagination.totalCount)} of{" "}
-              {pagination.totalCount}
+            <p className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap flex items-center gap-1.5">
+              <span>Showing</span>
+              <span className="font-semibold text-foreground px-1.5 py-0.5 bg-green-50 dark:bg-green-950 rounded">
+                {(page - 1) * pageSize + 1}
+              </span>
+              <span>to</span>
+              <span className="font-semibold text-foreground px-1.5 py-0.5 bg-green-50 dark:bg-green-950 rounded">
+                {Math.min(page * pageSize, pagination.totalCount)}
+              </span>
+              <span>of</span>
+              <span className="font-bold text-base sm:text-lg text-green-600 dark:text-green-400 px-2 py-0.5 bg-green-100 dark:bg-green-900 rounded-md">
+                {pagination.totalCount}
+              </span>
+              <span>transactions</span>
             </p>
             <div className="flex items-center gap-2">
               <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
