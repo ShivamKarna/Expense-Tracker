@@ -19,23 +19,23 @@ export default async function AccountPage({
   const { transactions, ...account } = accountData;
 
   return (
-    <div className="space-y-8 px-5">
-      <div className="flex gap-4 items-end justify-between">
-        <div>
-          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">
+    <div className="space-y-8 px-3 sm:px-5 max-w-full overflow-x-hidden">
+      <div className="flex flex-col sm:flex-row gap-4 sm:items-end sm:justify-between">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight gradient-title capitalize wrap-break-word">
             {account.name}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm sm:text-base">
             {account.type.charAt(0) + account.type.slice(1).toLowerCase()}{" "}
             Account
           </p>
         </div>
 
-        <div className="text-right pb-2">
-          <div className="text-xl sm:text-2xl font-bold">
+        <div className="text-left sm:text-right pb-2 min-w-0">
+          <div className="text-lg sm:text-xl lg:text-2xl font-bold wrap-break-word">
             ${parseFloat(account.balance.toString()).toFixed(2)}
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             {account._count?.transactions || 0} Transactions
           </p>
         </div>
