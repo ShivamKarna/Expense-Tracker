@@ -52,7 +52,7 @@ export default async function AccountPage({
       <Suspense
         fallback={<BarLoader className="mt-4" width={"100%"} color="#9333ea" />}
       >
-        <TransactionTable transactions={transactions} />
+        <TransactionTable accountId={id} />
       </Suspense>
     </div>
   );
