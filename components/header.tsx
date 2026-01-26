@@ -14,7 +14,7 @@ import { checkUser } from "@/lib/checkUser";
 const Header = async () => {
   await checkUser();
   return (
-    <div className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b">
+    <div className="fixed top-0 left-0 right-0 w-full bg-white/80 backdrop-blur-md z-50 border-b shadow-sm">
       <nav className="container mx-auto px-4 py-2 flex items-center justify-between">
         <Link href="/">
           <Image

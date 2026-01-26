@@ -296,7 +296,7 @@ const TransactionTable = ({
         )}
       </div>
     </div>
-      <div className="rounded-md border overflow-x-auto -mx-3 sm:mx-0 scroll-smooth [scrollbar-width:thin] [scrollbar-color:rgb(203_213_225)_transparent]">
+      <div className="rounded-md border overflow-x-auto -mx-3 sm:mx-0 scroll-smooth custom-scrollbar">
         <div className="min-w-[600px]">
         <Table>
           <TableHeader>
