@@ -9,6 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "ExpenseTracker",
   description: "The place to track expenses",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
 };
 
 export default function RootLayout({
@@ -21,7 +22,7 @@ export default function RootLayout({
       <html lang="en">
         <body className={`${inter.className}`}>
           <Header />
-          <main className="min-h-screen">{children}</main>
+          <main className="min-h-screen overflow-x-hidden">{children}</main>
           <Toaster richColors />
           {/* Footer */}
           <footer className="bg-blue-100 py-12">
