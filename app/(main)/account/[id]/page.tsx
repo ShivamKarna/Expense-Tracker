@@ -3,6 +3,7 @@ import { BarLoader } from "react-spinners";
 import { notFound } from "next/navigation";
 import { getAccountWithTransactions } from "@/actions/accounts";
 import TransactionTable from "../_components/transaction-table";
+import AccountChart from "../_components/account-chart";
 
 export default async function AccountPage({
   params,
@@ -16,7 +17,7 @@ export default async function AccountPage({
     notFound();
   }
 
-  const { transactions, ...account } = accountData;
+  const account = accountData;
 
   return (
     <div className="space-y-8 px-3 sm:px-5 max-w-full overflow-x-hidden">
@@ -36,7 +37,7 @@ export default async function AccountPage({
             ${parseFloat(account.balance.toString()).toFixed(2)}
           </div>
           <div className="mt-2 flex items-center gap-2 sm:justify-end">
-            <span className="inline-flex items-center justify-center px-3 py-1.5 text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-sm">
+            <span className="inline-flex items-center justify-center px-3 py-1.5 text-sm sm:text-base font-semibold text-white bg-linear-to-r from-green-500 to-green-600 rounded-lg shadow-sm">
               {account._count?.transactions || 0}
             </span>
             <span className="text-xs sm:text-sm text-muted-foreground font-medium">
@@ -48,9 +49,20 @@ export default async function AccountPage({
 
       {/* Chart Section */}
       <Suspense
-        fallback={<BarLoader className="mt-4" width={"100%"} color="#9333ea" />}
+        fallback={<BarLoader className="mt-4" width={"100%"} color="#0ccb08" />}
       >
-        {/* <AccountChart transactions={transactions} /> */}
+        <AccountChart
+          transactions={
+            account.transactions?.map((t) => ({
+              date: t.date,
+              type: t.type,
+              amount:
+                typeof t.amount === "number"
+                  ? t.amount
+                  : parseFloat(t.amount.toString()),
+            })) || []
+          }
+        />
       </Suspense>
 
       {/* Transactions Table */}
