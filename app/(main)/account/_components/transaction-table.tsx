@@ -264,7 +264,7 @@ const TransactionTable = ({ accountId }: { accountId: string }) => {
         </div>
         <div className="flex gap-2 flex-wrap">
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-full sm:w-[140px]">
+            <SelectTrigger className="w-full sm:w-35">
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
@@ -276,7 +276,7 @@ const TransactionTable = ({ accountId }: { accountId: string }) => {
             value={recurringFilter}
             onValueChange={(value) => setRecurringFilter(value)}
           >
-            <SelectTrigger className="w-full sm:w-[160px]">
+            <SelectTrigger className="w-full sm:w-40">
               <SelectValue placeholder="All Transactions" />
             </SelectTrigger>
             <SelectContent>
@@ -318,7 +318,7 @@ const TransactionTable = ({ accountId }: { accountId: string }) => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-14 min-w-[56px] px-3">
+                  <TableHead className="w-14 min-w-14 px-3">
                     {!fetchLoading && (
                       <div className="flex items-center justify-center">
                         <Checkbox
@@ -346,11 +346,11 @@ const TransactionTable = ({ accountId }: { accountId: string }) => {
                         ))}
                     </div>
                   </TableHead>
-                  <TableHead className="min-w-[120px] max-w-[250px]">
+                  <TableHead className="min-w-30 max-w-62.5">
                     Description
                   </TableHead>
                   <TableHead
-                    className="cursor-pointer min-w-[100px]"
+                    className="cursor-pointer min-w-25"
                     onClick={() => handleSort("category")}
                   >
                     <div className="flex items-center">
@@ -364,7 +364,7 @@ const TransactionTable = ({ accountId }: { accountId: string }) => {
                     </div>
                   </TableHead>
                   <TableHead
-                    className="cursor-pointer min-w-[100px]"
+                    className="cursor-pointer min-w-25"
                     onClick={() => handleSort("amount")}
                   >
                     <div className="flex items-center justify-end">
@@ -377,8 +377,8 @@ const TransactionTable = ({ accountId }: { accountId: string }) => {
                         ))}
                     </div>
                   </TableHead>
-                  <TableHead className="min-w-[110px]">Recurring</TableHead>
-                  <TableHead className="w-12 min-w-[48px]" />
+                  <TableHead className="min-w-27.5">Recurring</TableHead>
+                  <TableHead className="w-12 min-w-12" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -386,7 +386,7 @@ const TransactionTable = ({ accountId }: { accountId: string }) => {
                   // Skeleton loading rows
                   Array.from({ length: pageSize }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`}>
-                      <TableCell className="w-14 min-w-[56px] px-3">
+                      <TableCell className="w-14 min-w-14 px-3">
                         <div className="flex items-center justify-center">
                           <Skeleton className="h-4 w-4" />
                         </div>
@@ -423,7 +423,7 @@ const TransactionTable = ({ accountId }: { accountId: string }) => {
                 ) : (
                   filteredAndSortedTransactions.map((transaction) => (
                     <TableRow key={transaction.id}>
-                      <TableCell className="w-14 min-w-[56px] px-3">
+                      <TableCell className="w-14 min-w-14 px-3">
                         <div className="flex items-center justify-center">
                           <Checkbox
                             onCheckedChange={() => handleSelect(transaction.id)}
@@ -434,7 +434,7 @@ const TransactionTable = ({ accountId }: { accountId: string }) => {
                       <TableCell className="whitespace-nowrap">
                         {format(new Date(transaction.date), "PP")}
                       </TableCell>
-                      <TableCell className="max-w-[120px] md:max-w-[180px] lg:max-w-[250px]">
+                      <TableCell className="max-w-30 md:max-w-45 lg:max-w-62.5">
                         <div className="truncate">
                           {transaction.description}
                         </div>
@@ -554,7 +554,7 @@ const TransactionTable = ({ accountId }: { accountId: string }) => {
                 value={pageSize.toString()}
                 onValueChange={handlePageSizeChange}
               >
-                <SelectTrigger className="w-[80px] sm:w-[100px]">
+                <SelectTrigger className="w-20 sm:w-25">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
