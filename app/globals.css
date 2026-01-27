@@ -130,7 +130,7 @@
 }
 @layer base {
   .gradient-title {
-    @apply bg-gradient-to-br from-slate-700 to-green-400 font-semibold  tracking-tighter pr-2 pb-2 text-transparent bg-clip-text;
+    @apply bg-linear-to-br from-slate-700 to-green-400 font-semibold  tracking-tighter pr-2 pb-2 text-transparent bg-clip-text;
   }
 }
 
@@ -156,22 +156,22 @@
     height: 8px;
     width: 8px;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
     border-radius: 4px;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: rgb(203 213 225);
     border-radius: 4px;
     transition: background 0.2s ease;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgb(148 163 184);
   }
-  
+
   /* Firefox */
   .custom-scrollbar {
     scrollbar-width: thin;
@@ -195,13 +195,13 @@
     touch-action: pan-x;
     -webkit-touch-callout: none;
   }
-  
+
   .smooth-horizontal-scroll > * {
     transform: translate3d(0, 0, 0);
     -webkit-transform: translate3d(0, 0, 0);
     will-change: transform;
   }
-  
+
   /* Optimize table rendering during scroll */
   .smooth-horizontal-scroll table {
     transform: translate3d(0, 0, 0);
